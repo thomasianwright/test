@@ -1,0 +1,5 @@
+<MudForm Model="@LoginDto">
+    <MudTextField Label="Email" T="string" For="() => LoginDto.Email" @bind-Value="@LoginDto.Email" InputType="InputType.Email" />
+    <MudTextField Label="Password" T="string" For="() => LoginDto.Password" @bind-Value="@LoginDto.Password" InputType="InputType.Password" />
+    <MudButton OnClick="SubmitLogin">Login</MudButton>
+</MudForm>

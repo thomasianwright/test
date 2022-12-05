@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <OpenApiReference Include="../../../Property.Api/src/Property.Api/swagger.json">
+            <CodeGenerator>NSwagCSharp</CodeGenerator>
+            <Link>OpenAPIs\swagger-v1.json</Link>
+            <Namespace>Property.WebApp.BusinessLogic.ApiClients</Namespace>
+            <ClassName>PropertyApiClient</ClassName>
+            <OutputPath>../ApiClients/PropertyApiClient.cs</OutputPath>
+            <Options>/UseBaseUrl:false /GenerateClientInterfaces:true /GenerateNullableReferenceTypes:false</Options>
+        </OpenApiReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+        <PackageReference Include="Blazorise" Version="1.1.4.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+        <PackageReference Include="MudBlazor" Version="6.1.3-dev.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+        <PackageReference Include="NSwag.ApiDescription.Client" Version="13.18.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="State" />
+    </ItemGroup>
+</Project>

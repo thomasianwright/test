@@ -1,0 +1,9 @@
+global using Xunit;
+global using AutoMapper;
+global using FluentAssertions;
+global using Moq;
+global using Property.Api.BusinessLogic.MappingProfiles;
+global using Property.Api.BusinessLogic.Services;
+global using Property.Api.Contracts.Repositories;
+global using Property.Api.Contracts.Services;
+global using Property.Api.Core.Models;

@@ -1,0 +1,28 @@
+﻿@page "/"
+@using Caliqon.Property.WebApp.BusinessLogic.Services
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+
+<MudButton OnClick="GetToken">Get Token</MudButton>
+
+<MudText>@Token</MudText>
+
+
+@code {
+    [Inject]
+    private ITokenService TokenService { get; set; }
+    private string Token { get; set; }
+    
+    private async Task GetToken()
+    {
+        Token = await TokenService.GetTokenAsync();
+        Console.WriteLine(Token);
+        StateHasChanged();
+    }
+
+}

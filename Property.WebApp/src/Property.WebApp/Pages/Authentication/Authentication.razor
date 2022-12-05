@@ -1,0 +1,30 @@
+@page "/Authentication/{component}"
+<h3>Authentication</h3>
+
+<MudContainer>
+    @switch (Component.ToLower())
+    {
+        case "login":
+            <Login ReturnUrl="@ReturnUrl" />
+            break;
+        default:
+            <h1>Not Found</h1>
+            break;
+    }
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public string Component { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ReturnUrl ??= "/";
+    }
+
+}
