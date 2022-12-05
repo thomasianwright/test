@@ -7,5 +7,6 @@ public interface ITokenService
 {
     string UserId { get; }
     Task<string> GetTokenAsync();
+    Task Logout();
     void SetAuthenticationState(AuthenticateResponseDto authenticateResponseDto);
 }

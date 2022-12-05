@@ -1,0 +1,14 @@
+@page "/Dashboard"
+@using Property.WebApp.BusinessLogic.Providers
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Dashboard - Caliqon</PageTitle>
+<MudContainer>
+    Welcome, @AuthenticationStateProvider.DisplayName
+</MudContainer>
+
+@code {
+   [Inject]
+   private JwtAuthenticationStateProvider AuthenticationStateProvider { get; set; }
+}

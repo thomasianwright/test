@@ -1,40 +1,40 @@
 ﻿@page "/"
-@using Caliqon.Property.WebApp.BusinessLogic.Services
-
-<PageTitle>Index</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-
-<AuthorizeView>
-    <Authorized>
-        <MudButton OnClick="GetToken">Get Token</MudButton>
-
-        <MudText>@Token</MudText>
-    </Authorized>
-    <Authorizing>
-        Authorizing...
-    </Authorizing>
-    <NotAuthorized>
-        Not Authorized
-    </NotAuthorized>
-</AuthorizeView>
-
+@using Property.WebApp.BusinessLogic.Providers
+@using Property.WebApp.BusinessLogic.ApiClients
+@using Blazored.LocalStorage
+@attribute [Authorize]
+<PageTitle>Caliqon - Redirecting</PageTitle>
 
 @code {
 
     [Inject]
-    private ITokenService TokenService { get; set; }
+    private JwtAuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
-    private string Token { get; set; }
-
-    private async Task GetToken()
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+    
+    [Inject]
+    private ILocalStorageService LocalStorageService { get; set; }
+    
+    protected override async Task OnInitializedAsync()
     {
-        Token = await TokenService.GetTokenAsync();
-        Console.WriteLine(Token);
-        StateHasChanged();
+        if (AuthenticationStateProvider.IsLoggedIn)
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            var authenticationState = await LocalStorageService.GetItemAsync<AuthenticateResponseDto>(JwtAuthenticationStateProvider.AuthStateStorageName);
+            
+            if (authenticationState is not null)
+            {
+                 await AuthenticationStateProvider.Login(authenticationState);
+            }
+
+            StateHasChanged();
+        }
+
+        await base.OnInitializedAsync();
     }
 
 }

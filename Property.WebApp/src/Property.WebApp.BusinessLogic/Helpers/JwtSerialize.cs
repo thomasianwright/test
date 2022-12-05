@@ -26,7 +26,7 @@ public class JwtSerialize
             var index = 0;
             foreach (var entry in data)
             {
-                claims[index] = JwtNodeToClaim(entry.Key, entry.Value);
+                if (entry.Value != null) claims[index] = JwtNodeToClaim(entry.Key, entry.Value);
                 index++;
             }
 

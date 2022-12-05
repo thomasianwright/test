@@ -11,8 +11,8 @@ namespace Property.WebApp.Pages.Authentication;
 
 public partial class Login
 {
-    [Parameter] public string ReturnUrl { get; set; }
-    public LoginDto LoginDto { get; set; }
+    [Parameter] public string? ReturnUrl { get; set; }
+    private LoginDto LoginDto { get; set; }
     [Inject] private IPropertyApiClient ApiClient { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private ISnackbar Snackbar { get; set; }
@@ -21,7 +21,6 @@ public partial class Login
     protected override void OnInitialized()
     {
         LoginDto = new LoginDto();
-        
         base.OnInitialized();
     }
 
@@ -33,8 +32,10 @@ public partial class Login
             if (result is not null)
             {
                 await JwtAuthenticationStateProvider.Login(result);
+                Console.WriteLine($"Login success redirecting to {ReturnUrl}");
+                NavigationManager.NavigateTo(ReturnUrl ?? "/");
                 
-                NavigationManager.NavigateTo(ReturnUrl);
+                StateHasChanged();
             } 
         }
         catch (ApiException e)

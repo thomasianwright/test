@@ -25,10 +25,6 @@ builder.Services.AddHttpClient<IPropertyApiClient, PropertyApiClient>(((sp, clie
     }))
     .AddHttpMessageHandler<JwtMessageHandler>();
 
-builder.Services.AddSingleton<JwtAuthenticationStateProvider>();
-builder.Services.AddSingleton<AuthenticationStateProvider>(provider =>
-    provider.GetRequiredService<JwtAuthenticationStateProvider>());
-
 builder.Services.AddScoped<JwtMessageHandler>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddMudServices();
@@ -42,7 +38,19 @@ builder.Services.AddBlazoredLocalStorage(config =>
     config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
     config.JsonSerializerOptions.WriteIndented = false;
 });
+
+builder.Services.AddSingleton<JwtAuthenticationStateProvider>();
+builder.Services.AddSingleton<AuthenticationStateProvider>(provider =>
+    provider.GetRequiredService<JwtAuthenticationStateProvider>());
+
 builder.Services.AddOptions();
-builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthorizationCore(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("RequireModeratorRole", policy => policy.RequireRole("Moderator"));
+    options.AddPolicy("RequireCompanyUser", policy => policy.RequireRole("CompanyUser"));
+    options.AddPolicy("RequireTenantRole", policy => policy.RequireRole("TenantUser"));
+});
+
 
 await builder.Build().RunAsync();

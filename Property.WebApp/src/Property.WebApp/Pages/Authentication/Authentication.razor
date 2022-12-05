@@ -1,17 +1,22 @@
 @page "/Authentication/{component}"
-<h3>Authentication</h3>
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
 
-<MudContainer>
+<div class="d-flex m-auto d-flex m-auto justify-center align-center align-content-center" style="height: 100%; width: 100%;">
     @switch (Component.ToLower())
     {
         case "login":
-            <Login ReturnUrl="@ReturnUrl" />
+            <Login ReturnUrl="@ReturnUrl"/>
+            break;
+        case "logout":
+            <Logout/>
             break;
         default:
-            <h1>Not Found</h1>
+            <NotFound/>
             break;
     }
-</MudContainer>
+</div>
+
 
 @code {
 
@@ -24,7 +29,7 @@
 
     protected override void OnInitialized()
     {
-        ReturnUrl ??= "/";
+        if (string.IsNullOrEmpty(ReturnUrl)) ReturnUrl = "/";
     }
 
 }

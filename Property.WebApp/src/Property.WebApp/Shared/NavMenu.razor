@@ -1,0 +1,21 @@
+<MudNavMenu>
+    <MudText Typo="Typo.h6" Class="px-4">Caliqon</MudText>
+    <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Property Management</MudText>
+    <MudDivider Class="my-2"/>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/dashboard">Dashboard</MudNavLink>
+            <MudNavGroup Title="Settings" Expanded="true">
+                <MudNavLink Href="/security">Account</MudNavLink>
+                <MudNavLink Href="/billing" Disabled="true">Billing</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink>Logout</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView>
+        <NotAuthorized>
+            <MudNavLink Href="/authentication/login">Login</MudNavLink>
+            <MudNavLink Href="/authentication/register">Register</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudNavMenu>

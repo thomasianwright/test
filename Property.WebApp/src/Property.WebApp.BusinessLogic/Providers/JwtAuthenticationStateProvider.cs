@@ -5,6 +5,7 @@ using Caliqon.Property.WebApp.BusinessLogic.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Property.WebApp.BusinessLogic.ApiClients;
 
 namespace Property.WebApp.BusinessLogic.Providers;
@@ -14,7 +15,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
     private readonly ILocalStorageService _localStorageService;
     private readonly ITokenService _tokenService;
     private readonly NavigationManager _navigationManager;
-
+    public static string AuthStateStorageName = "auth_state";
     public JwtAuthenticationStateProvider(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
@@ -33,41 +34,35 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
     public bool IsLoggedIn => _user != null;
 
 
-    public async Task Login(AuthenticateResponseDto? loginDto = null)
+    public async Task Login(AuthenticateResponseDto loginDto)
     {
-        var authenticationState = await _localStorageService.GetItemAsync<AuthenticateResponseDto>("auth_state");
+        await _localStorageService.SetItemAsync(AuthStateStorageName, loginDto);
 
-        if (loginDto is not null)
-        {
-            await _localStorageService.SetItemAsync("auth_state", loginDto);
-            authenticationState = loginDto;
-        }
-
-        if (authenticationState is not null &&
-            authenticationState.RefreshTokenExpiry.DateTime.ToUniversalTime()
-            < DateTime.Now.ToUniversalTime())
-        {
-            await _localStorageService.RemoveItemAsync("auth_state");
-            authenticationState = null;
-        }
-
-        {
-            _tokenService.SetAuthenticationState(authenticationState);
-            _user = authenticationState.User;
-
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-            return;
-        }
-
-        _navigationManager.NavigateTo("/authentication/login");
+        if (DateTime.Compare(loginDto.RefreshTokenExpiry.DateTime, DateTime.Now) <= 0)
+            await Logout();
+        
+        _tokenService.SetAuthenticationState(loginDto);
+        _user = loginDto.User;
+        
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
-    public Task Logout()
+    public async Task Logout()
     {
+        Console.WriteLine($"Logged out {_user?.Email}");
         _user = null;
-        NotifyAuthenticationStateChanged(GetState());
+        
+        await _localStorageService.RemoveItemAsync(AuthStateStorageName);
+        
+        await _tokenService.Logout();
+        
+        _navigationManager.NavigateTo("/authentication/logout");
+        var state = await GetAuthenticationStateAsync();
 
-        return Task.CompletedTask;
+        // Console.WriteLine(JsonConvert.SerializeObject(state));
+        Console.WriteLine("Logged out!");
+
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -77,8 +72,13 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 
     private async Task<AuthenticationState> GetState()
     {
-        return _user != null
-            ? new AuthenticationState(JwtSerialize.Deserialize(await _tokenService.GetTokenAsync()))
+        var token = await _tokenService.GetTokenAsync();
+        Console.WriteLine($"token from {nameof(GetState)} {token}");
+        Console.WriteLine($"user is null : {_user == null}");
+        var toReturn = _user != null
+            ? new AuthenticationState(JwtSerialize.Deserialize(token))
             : NotAuthenticatedState;
+
+        return toReturn;
     }
 }

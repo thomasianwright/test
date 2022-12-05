@@ -1,5 +1,22 @@
-<MudForm Model="@LoginDto">
-    <MudTextField Label="Email" T="string" For="() => LoginDto.Email" @bind-Value="@LoginDto.Email" InputType="InputType.Email" />
-    <MudTextField Label="Password" T="string" For="() => LoginDto.Password" @bind-Value="@LoginDto.Password" InputType="InputType.Password" />
-    <MudButton OnClick="SubmitLogin">Login</MudButton>
-</MudForm>
+@attribute [AllowAnonymous]
+
+<MudItem xs="12" sm="6">
+    <MudPaper Class="pa-4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h2" Align="Align.Center">Login</MudText>
+                <MudText Typo="Typo.h5" Align="Align.Center">Please enter your credentials</MudText>
+                <MudDivider/>
+                <MudForm Model="@LoginDto">
+                    <MudTextField Label="Email" T="string" For="() => LoginDto.Email" @bind-Value="@LoginDto.Email" InputType="InputType.Email"/>
+                    <MudTextField Label="Password" T="string" For="() => LoginDto.Password" @bind-Value="@LoginDto.Password" InputType="InputType.Password"/>
+                    <MudSwitch T="bool">Remember me for 14 days</MudSwitch>
+                </MudForm>
+            </MudCardContent>
+            <MudCardActions Class="d-flex flex-row justify-space-between align-center">
+                <MudLink Href="/authentication/register">Register if you don't have an account</MudLink>
+                <MudButton OnClick="SubmitLogin" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudPaper>
+</MudItem>

@@ -28,7 +28,7 @@ public class JwtMessageHandler : DelegatingHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        if (request.RequestUri == null || request.RequestUri.AbsolutePath.Contains("RefreshToken"))
+        if (request.RequestUri == null || request.RequestUri.AbsolutePath.Contains("RefreshToken") || request.RequestUri.AbsolutePath.Contains("Login"))
             return await base.SendAsync(request, cancellationToken);
         
         var token = await _tokenService.GetTokenAsync();
