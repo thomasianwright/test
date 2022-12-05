@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Newtonsoft.Json;
 using Property.WebApp.BusinessLogic.ApiClients;
-using Property.WebApp.Providers;
+using Property.WebApp.BusinessLogic.Providers;
 
 namespace Property.WebApp.Pages.Authentication;
 

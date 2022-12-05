@@ -26,7 +26,9 @@ public class TokenService : ITokenService
 
     public async Task<string> GetTokenAsync()
     {
-        if(AccessTokenExpiry.HasValue && DateTime.Compare(DateTime.Now, AccessTokenExpiry.Value.DateTime) >= 0 && IsLoggedIn)
+        var accessTokenValid = AccessTokenExpiry.HasValue && AccessTokenExpiry.Value.ToUniversalTime() < DateTime.Now.ToUniversalTime();
+        Console.WriteLine($"Access token valid: {accessTokenValid}");
+        if(accessTokenValid && IsLoggedIn)
         {
             return await RefreshTokenAsync();
         }
@@ -55,6 +57,7 @@ public class TokenService : ITokenService
 
     public void SetAuthenticationState(AuthenticateResponseDto authenticateResponseDto)
     {
+        Console.WriteLine(JsonConvert.SerializeObject(authenticateResponseDto));
         AccessToken = authenticateResponseDto.Token;
         RefreshToken = authenticateResponseDto.RefreshToken;
         UserId = authenticateResponseDto.UserId;

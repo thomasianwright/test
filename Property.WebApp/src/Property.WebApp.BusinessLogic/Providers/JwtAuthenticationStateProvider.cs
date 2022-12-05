@@ -1,6 +1,4 @@
-using System;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Caliqon.Property.WebApp.BusinessLogic.Helpers;
 using Caliqon.Property.WebApp.BusinessLogic.Services;
@@ -9,7 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Property.WebApp.BusinessLogic.ApiClients;
 
-namespace Property.WebApp.Providers;
+namespace Property.WebApp.BusinessLogic.Providers;
 
 public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
@@ -29,40 +27,32 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
         new (new ClaimsPrincipal());
 
     private UserDto? _user;
-
-    /// <summary>
-    /// The display name of the user.
-    /// </summary>
+    
     public string DisplayName => $"{_user.FirstName} {_user.LastName}";
 
-    /// <summary>
-    /// <see langword="true"/> if there is a user logged in, otherwise false.
-    /// </summary>
     public bool IsLoggedIn => _user != null;
-
-    /// <summary>
-    /// Login the user with a given JWT token.
-    /// </summary>
-    /// <param name="jwt">The JWT token.</param>
-    public async Task Login(AuthenticateResponseDto? loginDto)
+    
+    public async Task Login(AuthenticateResponseDto? loginDto = null)
     {
         var authenticationState = await _localStorageService.GetItemAsync<AuthenticateResponseDto>("auth_state");
 
-        if (authenticationState is null && loginDto is not null)
+        if (loginDto is not null)
         {
             await _localStorageService.SetItemAsync("auth_state", loginDto);
+            authenticationState = loginDto;
         }
         
-        if (authenticationState is not null || loginDto is not null)
+        if (authenticationState is not null)
         {
-            _tokenService.SetAuthenticationState(authenticationState ?? loginDto);
-            _user = authenticationState?.User;
+            _tokenService.SetAuthenticationState(authenticationState);
+            _user = authenticationState.User;
+            
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
+        
+        _navigationManager.NavigateTo("/authentication/login");
     }
-
-    /// <summary>
-    /// Logout the current user.
-    /// </summary>
+    
     public Task Logout()
     {
         _user = null;
@@ -70,17 +60,12 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
         
         return Task.CompletedTask;
     }
-
-    /// <inheritdoc/>
+    
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         return GetState();
     }
-
-    /// <summary>
-    /// Constructs an authentication state.
-    /// </summary>
-    /// <returns>The created state.</returns>
+    
     private async Task<AuthenticationState> GetState()
     {
         return _user != null

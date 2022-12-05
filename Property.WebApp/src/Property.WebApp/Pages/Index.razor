@@ -8,16 +8,28 @@
 Welcome to your new app.
 
 
-<MudButton OnClick="GetToken">Get Token</MudButton>
+<AuthorizeView>
+    <Authorized>
+        <MudButton OnClick="GetToken">Get Token</MudButton>
 
-<MudText>@Token</MudText>
+        <MudText>@Token</MudText>
+    </Authorized>
+    <Authorizing>
+        Authorizing...
+    </Authorizing>
+    <NotAuthorized>
+        Not Authorized
+    </NotAuthorized>
+</AuthorizeView>
 
 
 @code {
+
     [Inject]
     private ITokenService TokenService { get; set; }
+
     private string Token { get; set; }
-    
+
     private async Task GetToken()
     {
         Token = await TokenService.GetTokenAsync();

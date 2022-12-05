@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 using Property.WebApp;
 using Property.WebApp.BusinessLogic.ApiClients;
-using Property.WebApp.Providers;
+using Property.WebApp.BusinessLogic.Providers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
