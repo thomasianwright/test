@@ -43,7 +43,8 @@ public class AuthenticationController : ControllerBase
 
             var user = await _authenticationService.Authenticate(request);
             var expiry = DateTime.Now.AddMinutes(2);
-            var refreshTokenExpiry = DateTime.Now.AddDays(7);
+            
+            var refreshTokenExpiry = request.RememberMe ? DateTime.Now.AddDays(14) : DateTime.Now.AddHours(2);
 
             var (token, securityToken) = _tokenService.GenerateToken(user, expiry);
 
