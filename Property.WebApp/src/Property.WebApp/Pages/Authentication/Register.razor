@@ -1,0 +1,40 @@
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+<MudPaper>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudForm @ref="userDetailsForm" @bind-IsValid="@success" @bind-Errors="@userErrors">
+                <MudTextField T="string" Label="Email" @bind-Value="@registerDto.Email" Required="true" RequiredError="Email is required!"
+                              Validation="@(new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" })"/>
+                <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @bind-Value="@registerDto.Password"
+                              InputType="InputType.Password"
+                              Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                              RequiredError="Password is required!"/>
+                <MudTextField T="string"
+                              Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
+                              Validation="@(new Func<string, string>(PasswordMatch))"/>
+
+                <div class="d-flex align-center justify-space-between">
+                    <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!"/>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
+                </div>
+            </MudForm>
+        </MudItem>
+        <MudItem xs="12" sm="8">
+            <MudText Typo="Typo.subtitle2">Address</MudText>
+            <MudForm @ref="addressForm" @bind-IsValid="@success" @bind-Errors="@addressErrors">
+                <MudTextField T="string" Label="Address Line One" @bind-Value="@registerDto.Address.LineOne" Required="true" RequiredError="First line of the address in required."/>
+                <MudTextField T="string" Label="Address Line Two" @bind-Value="@registerDto.Address.LineTwo"/>
+                <MudTextField T="string" Label="Address Line Three" @bind-Value="@registerDto.Address.LineThree"/>
+                <MudTextField T="string" Label="Postcode" @bind-Value="@registerDto.Address.Postcode" Required="true" RequiredError="You must provide a postcode."/>
+                <MudTextField T="string" Label="County" @bind-Value="@registerDto.Address.County"/>
+                <MudSelect T="string" Label="Country" Variant="Variant.Outlined" Required="true" RequiredError="You must provide a country" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var country in Countries)
+                    {
+                        <MudSelectItem T="string" Value="@country">@country</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudForm>
+        </MudItem>
+    </MudGrid>
+</MudPaper>

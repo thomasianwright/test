@@ -10,7 +10,7 @@
                 <MudForm Model="@LoginDto">
                     <MudTextField Label="Email" T="string" For="() => LoginDto.Email" @bind-Value="@LoginDto.Email" InputType="InputType.Email"/>
                     <MudTextField Label="Password" T="string" For="() => LoginDto.Password" @bind-Value="@LoginDto.Password" InputType="InputType.Password"/>
-                    <MudSwitch T="bool">Remember me for 14 days</MudSwitch>
+                    <MudSwitch For="() => LoginDto.RememberMe" T="bool" @bind-Checked="@LoginDto.RememberMe">Remember me for 14 days</MudSwitch>
                 </MudForm>
             </MudCardContent>
             <MudCardActions Class="d-flex flex-row justify-space-between align-center">
