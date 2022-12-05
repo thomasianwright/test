@@ -15,7 +15,7 @@ public class TokenService : ITokenService
     {
         _serviceProvider = serviceProvider;
         AccessToken = string.Empty;
-        semaphore = new SemaphoreSlim(1, 1);
+        // semaphore = new SemaphoreSlim(1, 1);
     }
 
     private string? AccessToken { get; set; }
@@ -24,39 +24,39 @@ public class TokenService : ITokenService
     private DateTimeOffset? AccessTokenExpiry { get; set; }
     private DateTimeOffset? RefreshTokenExpiry { get; set; }
     private bool IsLoggedIn { get; set; }
-    private readonly SemaphoreSlim semaphore;
+    // private readonly SemaphoreSlim semaphore;
 
 
     public async Task<string> GetTokenAsync()
     {
-        await semaphore.WaitAsync();
-        Console.WriteLine(JsonConvert.SerializeObject(new
-        {
-            AccessToken,
-            RefreshToken,
-            UserId,
-            AccessTokenExpiry,
-            IsLoggedIn,
-            RefreshTokenExpiry
-        }));
-        try
-        {
-            var dateCompare = AccessTokenExpiry.HasValue &&
-                              DateTime.Compare(AccessTokenExpiry.Value.DateTime, DateTime.Now) > 0;
-            var accessTokenValid = dateCompare && !string.IsNullOrEmpty(AccessToken);
-            
-            Console.WriteLine($"Access token valid: {accessTokenValid}");
-            if (!accessTokenValid && IsLoggedIn)
-            {
-                return await RefreshTokenAsync();
-            }
+        // await semaphore.WaitAsync();
+        // Console.WriteLine(JsonConvert.SerializeObject(new
+        // {
+        //     AccessToken,
+        //     RefreshToken,
+        //     UserId,
+        //     AccessTokenExpiry,
+        //     IsLoggedIn,
+        //     RefreshTokenExpiry
+        // }));
+        // try
+        // {
+        var dateCompare = AccessTokenExpiry.HasValue &&
+                          DateTime.Compare(AccessTokenExpiry.Value.DateTime, DateTime.Now) > 0;
+        var accessTokenValid = dateCompare && !string.IsNullOrEmpty(AccessToken);
 
-            return AccessToken ?? string.Empty;
-        }
-        finally
+        Console.WriteLine($"Access token valid: {accessTokenValid}");
+        if (!accessTokenValid && IsLoggedIn)
         {
-            semaphore.Release();
+            return await RefreshTokenAsync();
         }
+
+        return AccessToken ?? string.Empty;
+        // }
+        // finally
+        // {
+        //     semaphore.Release();
+        // }
     }
 
     private async Task<string> RefreshTokenAsync()
