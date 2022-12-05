@@ -40,7 +40,8 @@ public class AuthenticationController : ControllerBase
             Guard.Against.Null(request);
             Guard.Against.NullOrWhiteSpace(request.Email);
             Guard.Against.NullOrWhiteSpace(request.Password);
-
+            Guard.Against.Null(request.RememberMe);
+            
             var user = await _authenticationService.Authenticate(request);
             var expiry = DateTime.Now.AddMinutes(2);
             
