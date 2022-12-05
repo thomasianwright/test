@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Property.WebApp.BusinessLogic.ApiClients;
@@ -29,12 +30,23 @@ public class TokenService : ITokenService
     public async Task<string> GetTokenAsync()
     {
         await semaphore.WaitAsync();
+        Console.WriteLine(JsonConvert.SerializeObject(new
+        {
+            AccessToken,
+            RefreshToken,
+            UserId,
+            AccessTokenExpiry,
+            IsLoggedIn,
+            RefreshTokenExpiry
+        }));
         try
         {
-            var accessTokenValid = AccessTokenExpiry.HasValue &&
-                                   AccessTokenExpiry.Value.ToUniversalTime() < DateTime.Now.ToUniversalTime();
+            var dateCompare = AccessTokenExpiry.HasValue &&
+                              DateTime.Compare(AccessTokenExpiry.Value.DateTime, DateTime.Now) > 0;
+            var accessTokenValid = dateCompare && !string.IsNullOrEmpty(AccessToken);
+            
             Console.WriteLine($"Access token valid: {accessTokenValid}");
-            if (accessTokenValid && IsLoggedIn)
+            if (!accessTokenValid && IsLoggedIn)
             {
                 return await RefreshTokenAsync();
             }
@@ -50,10 +62,15 @@ public class TokenService : ITokenService
     private async Task<string> RefreshTokenAsync()
     {
         using var scope = _serviceProvider.CreateScope();
+
+        AccessToken = null;
+        AccessTokenExpiry = null;
+
         var propertyApiClient = scope.ServiceProvider.GetRequiredService<IPropertyApiClient>();
+        var localStorageService = scope.ServiceProvider.GetRequiredService<ILocalStorageService>();
 
         if (string.IsNullOrEmpty(RefreshToken)) return string.Empty;
-        
+
         var response = await propertyApiClient.RefreshTokenAsync(new RegenerateTokenDto
         {
             Token = RefreshToken,
@@ -63,6 +80,11 @@ public class TokenService : ITokenService
         AccessToken = response.Token;
         AccessTokenExpiry = response.Expiry;
 
+        var user = await localStorageService.GetItemAsync<AuthenticateResponseDto>("auth_state");
+        user.Token = response.Token;
+        user.TokenExpiry = response.Expiry;
+
+        await localStorageService.SetItemAsync("auth_state", user);
         return AccessToken;
     }
 

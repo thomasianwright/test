@@ -43,12 +43,20 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             authenticationState = loginDto;
         }
 
-        if (authenticationState is not null)
+        if (authenticationState is not null &&
+            authenticationState.RefreshTokenExpiry.DateTime.ToUniversalTime()
+            < DateTime.Now.ToUniversalTime())
+        {
+            await _localStorageService.RemoveItemAsync("auth_state");
+            authenticationState = null;
+        }
+
         {
             _tokenService.SetAuthenticationState(authenticationState);
             _user = authenticationState.User;
 
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+            return;
         }
 
         _navigationManager.NavigateTo("/authentication/login");
