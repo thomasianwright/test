@@ -14,6 +14,7 @@ public class TokenService : ITokenService
     {
         _serviceProvider = serviceProvider;
         AccessToken = string.Empty;
+        semaphore = new SemaphoreSlim(1, 1);
     }
 
     private string? AccessToken { get; set; }
@@ -22,18 +23,28 @@ public class TokenService : ITokenService
     private DateTimeOffset? AccessTokenExpiry { get; set; }
     private DateTimeOffset? RefreshTokenExpiry { get; set; }
     private bool IsLoggedIn { get; set; }
-    
+    private readonly SemaphoreSlim semaphore;
+
 
     public async Task<string> GetTokenAsync()
     {
-        var accessTokenValid = AccessTokenExpiry.HasValue && AccessTokenExpiry.Value.ToUniversalTime() < DateTime.Now.ToUniversalTime();
-        Console.WriteLine($"Access token valid: {accessTokenValid}");
-        if(accessTokenValid && IsLoggedIn)
+        await semaphore.WaitAsync();
+        try
         {
-            return await RefreshTokenAsync();
+            var accessTokenValid = AccessTokenExpiry.HasValue &&
+                                   AccessTokenExpiry.Value.ToUniversalTime() < DateTime.Now.ToUniversalTime();
+            Console.WriteLine($"Access token valid: {accessTokenValid}");
+            if (accessTokenValid && IsLoggedIn)
+            {
+                return await RefreshTokenAsync();
+            }
+
+            return AccessToken ?? string.Empty;
         }
-        
-        return AccessToken ?? string.Empty;
+        finally
+        {
+            semaphore.Release();
+        }
     }
 
     private async Task<string> RefreshTokenAsync()
